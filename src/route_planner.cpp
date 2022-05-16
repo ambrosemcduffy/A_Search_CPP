@@ -23,7 +23,7 @@ RoutePlanner::RoutePlanner(RouteModel &model, float start_x, float start_y, floa
 // - Node objects have a distance method to determine the distance to another node.
 
 float RoutePlanner::CalculateHValue(RouteModel::Node const *node) {
-    return node->distance(*(end_node));
+    return node->distance(*this->end_node);
 }
 
 
@@ -71,6 +71,9 @@ RouteModel::Node *RoutePlanner::NextNode() {
     std::sort(open_list.begin(), this->open_list.end(), Compare);
     RouteModel::Node* minimumNode = this->open_list.back();
     this->open_list.pop_back();
+    if (minimumNode == nullptr){
+        std::cout << "Null found!!" << "\n";
+    }
     return minimumNode;
 }
 
@@ -90,16 +93,15 @@ std::vector<RouteModel::Node> RoutePlanner::ConstructFinalPath(RouteModel::Node 
     RouteModel::Node parent;
 
     // TODO: Implement your solution here.
-    while (current_node){
-        path_found.push_back(*current_node);
-        parent = *(current_node->parent);
-        distance += current_node->distance(parent);
+    while (current_node->parent != nullptr){
+        path_found.push_back(*(current_node));
+        distance += current_node->distance(*current_node->parent);
         current_node = current_node->parent;
     }
 
-    path_found.push_back(*current_node);
-
+    path_found.push_back(*(current_node));
     distance *= m_Model.MetricScale(); // Multiply the distance by the scale of the map to get meters.
+    std::reverse(path_found.begin(), path_found.end());
     return path_found;
 
 }
@@ -113,15 +115,15 @@ std::vector<RouteModel::Node> RoutePlanner::ConstructFinalPath(RouteModel::Node 
 // - Store the final path in the m_Model.path attribute before the method exits. This path will then be displayed on the map tile.
 
 void RoutePlanner::AStarSearch() {
-    start_node->visited = true;
-    open_list.push_back(start_node);
+    this->start_node->visited = true;
+    open_list.push_back(this->start_node);
     RouteModel::Node *current_node = nullptr;
 
     while (open_list.size() > 0){
         current_node = this->NextNode();
-        if (current_node->distance(*end_node) == 0){
+        if (current_node->distance(*this->end_node) == 0){
             m_Model.path = ConstructFinalPath(current_node);
-            return;
+            break;
         }
         this->AddNeighbors(current_node);
             
