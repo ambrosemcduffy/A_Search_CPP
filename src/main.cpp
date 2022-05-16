@@ -27,6 +27,29 @@ static std::optional<std::vector<std::byte>> ReadFile(const std::string &path)
     return std::move(contents);
 }
 
+std::vector<float> getUserInput(){
+    float start_x;
+    float start_y;
+    float end_x;
+    float end_y;
+
+    std::cout << "Start X number??:\n";
+    std::cin >> start_x;
+
+    std::cout << "Start y number??:\n";
+    std::cin >> start_y;
+
+    std::cout << "End X number??:\n";
+    std::cin >> end_x;
+
+    std::cout << "End Y number??:\n";
+    std::cin >> end_y;
+
+    std::vector<float> data = {start_x, start_y, end_x, end_y};
+    return data;
+}
+
+
 int main(int argc, const char **argv)
 {    
     std::string osm_data_file = "";
@@ -57,6 +80,13 @@ int main(int argc, const char **argv)
     // RoutePlanner object below in place of 10, 10, 90, 90.
 
     // Build Model.
+    // declaring our floats
+    std::vector<float> newData = getUserInput();
+    float start_x = newData[0];
+    float start_y = newData[1];
+    float end_x = newData[2];
+    float end_y = newData[3]; 
+
     RouteModel model{osm_data};
 
     // Create RoutePlanner object and perform A* search.
